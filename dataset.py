@@ -20,8 +20,8 @@ class COCODatasetWrapper(Dataset):
         # Get image and annotations
         sample = self.hf_dataset[idx]
         
-        # Convert PIL image to numpy array
-        image = np.array(sample['image'])
+        # Convert PIL image to RGB and then to numpy array
+        image = np.array(Image.fromarray(sample['image']).convert('RGB'))
         
         # Get bounding boxes and labels from the objects dictionary
         boxes = np.array(sample['objects']['bbox'], dtype=np.float32)
@@ -39,19 +39,20 @@ class COCODatasetWrapper(Dataset):
         boxes[:, [1, 3]] /= height
 
         # Convert to tensors
-        image = torch.from_numpy(image).permute(2, 0, 1)  # Convert to CxHxW format
-        boxes = torch.from_numpy(boxes)
-        labels = torch.from_numpy(labels)
+        image = torch.from_numpy(image).permute(2, 0, 1).contiguous()  # Convert to CxHxW format
+        boxes = torch.from_numpy(boxes).contiguous()
+        labels = torch.from_numpy(labels).contiguous()
 
         # Generate CenterNet targets
         targets = get_targets(boxes, labels, self.output_size, self.num_classes)
-
+        
+        # Clone all tensors to ensure they have resizable storage
         return {
-            'image': image,
-            'boxes': boxes,
-            'labels': labels,
-            'heatmap': targets['heatmap'],
-            'wh': targets['wh'],
-            'offset': targets['offset'],
-            'reg_mask': targets['reg_mask']
+            'image': image.clone(),
+            # 'boxes': boxes.clone(),
+            # 'labels': labels.clone(),
+            'heatmap': targets['heatmap'].clone(),
+            'wh': targets['wh'].clone(),
+            'offset': targets['offset'].clone(),
+            'reg_mask': targets['reg_mask'].clone()
         }
