@@ -1,0 +1,29 @@
+# Model configuration
+backbone: "resnet18"  # Options: resnet18, resnet34, resnet50
+num_classes: 80  # COCO has 80 classes
+output_size: 128  # Output feature map size
+
+# Training configuration
+device: "cuda"
+compile: true  # Whether to use torch.compile
+epochs: 100
+batch_size: 32
+eval_batch_size: 64
+num_workers: 8
+log_interval: 100
+
+# Optimizer configuration
+lr: 1.25e-4
+weight_decay: 1e-4
+
+# Loss weights
+heatmap_weight: 1.0
+wh_weight: 0.1
+offset_weight: 1.0
+
+# Gradient clipping
+grad_clip: true
+grad_clip_value: 35.0
+
+# Run configuration
+run_name: null
