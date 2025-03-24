@@ -1,5 +1,19 @@
 # CenterNet Implementation
 
+## Training
+
+```
+python3 train.py
+```
+
+## TODO
+
+- start from pretrained resnet
+- measure COCO metrics e.g. mAP
+- visualize the result in notebook
+- manage depedency with uv
+- handle flipped bbox min and max
+
 ## Reference Implementations and Resources
 
 - [CenterNet Official Implementation](https://github.com/xingyizhou/CenterNet/blob/4c50fd3a46bdf63dbf2082c5cbb3458d39579e6c/src/main.py#L32)
