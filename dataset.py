@@ -4,11 +4,14 @@ import albumentations as A
 import numpy as np
 import json
 from PIL import Image
+from utils import get_targets
 
 class COCODatasetWrapper(Dataset):
-    def __init__(self, hf_dataset, transforms=A.Normalize()):
+    def __init__(self, hf_dataset, transforms=A.Normalize(), output_size=(128, 128), num_classes=80):
         self.hf_dataset = hf_dataset.with_format("numpy")
         self.transforms = transforms
+        self.output_size = output_size
+        self.num_classes = num_classes
     
     def __len__(self):
         return len(self.hf_dataset)
@@ -40,8 +43,15 @@ class COCODatasetWrapper(Dataset):
         boxes = torch.from_numpy(boxes)
         labels = torch.from_numpy(labels)
 
+        # Generate CenterNet targets
+        targets = get_targets(boxes, labels, self.output_size, self.num_classes)
+
         return {
             'image': image,
             'boxes': boxes,
             'labels': labels,
+            'heatmap': targets['heatmap'],
+            'wh': targets['wh'],
+            'offset': targets['offset'],
+            'reg_mask': targets['reg_mask']
         }
